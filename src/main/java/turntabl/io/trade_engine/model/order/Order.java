@@ -84,4 +84,12 @@ public class Order extends DateAudit {
     public void setOrder_status(String order_status) {
         this.order_status = order_status;
     }
+
+    public String getOrder_type() {
+        return order_type;
+    }
+
+    public void setOrder_type(String order_type) {
+        this.order_type = order_type;
+    }
 }

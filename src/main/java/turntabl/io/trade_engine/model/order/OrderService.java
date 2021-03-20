@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 @Service
 public class OrderService {
@@ -14,6 +15,11 @@ public class OrderService {
     @Autowired
     public OrderService(OrderRepository orderRepository) {
         this.orderRepository = orderRepository;
+    }
+
+    public Order findOrder(int order_id) {
+        Optional<Order> order = orderRepository.findById(order_id);
+        return order.get();
     }
 
     public List<Order> getOrders() { return orderRepository.findAll();}
