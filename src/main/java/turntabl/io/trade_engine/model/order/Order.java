@@ -1,15 +1,16 @@
 package turntabl.io.trade_engine.model.order;
 
-import turntabl.io.client_connectivity.DateAudit;
-import turntabl.io.client_connectivity.portfolio.Portfolio;
-import turntabl.io.client_connectivity.product.Product;
-import turntabl.io.client_connectivity.user.User;
+
+
+import turntabl.io.trade_engine.model.Portfolio;
+import turntabl.io.trade_engine.model.Product;
+import turntabl.io.trade_engine.model.User;
 
 import javax.persistence.*;
 
 @Entity(name = "Order")
 @Table(name="porders")
-public class Order extends DateAudit {
+public class Order  {
     @Id
     @SequenceGenerator(
             name = "order_sequence",
@@ -91,5 +92,9 @@ public class Order extends DateAudit {
 
     public void setOrder_type(String order_type) {
         this.order_type = order_type;
+    }
+
+    public Product getProduct() {
+        return product;
     }
 }
