@@ -61,11 +61,11 @@ public class TradeEngineConfig {
     }
 
 //    rabbit mq config
-    @Value("${menu.rabbitmq.queue}")
+    @Value("${trade.engine.rabbitmq.queue}")
     String queueName;
-    @Value("${menu.rabbitmq.exchange}")
+    @Value("${trade.engine.rabbitmq.exchange}")
     String exchange;
-    @Value("${menu.rabbitmq.key}")
+    @Value("${trade.engine.rabbitmq.key}")
     private String key;
 
     @Value("${spring.rabbitmq.host}")
@@ -92,7 +92,7 @@ public class TradeEngineConfig {
     public CachingConnectionFactory rabbitConnectionFactory(){
         CachingConnectionFactory connection = new CachingConnectionFactory();
         connection.setHost(host);
-        connection.setPort(5672);
+        connection.setPort(15672);
         connection.setUsername(userName);
         connection.setPassword(password);
         return connection;
