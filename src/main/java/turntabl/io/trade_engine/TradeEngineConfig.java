@@ -76,6 +76,9 @@ public class TradeEngineConfig {
     @Value("${spring.rabbitmq.username}")
     private String userName;
 
+    @Value("${spring.rabbitmq.port}")
+    private int port;
+
     @Bean
     Queue queue(){
         return new Queue(queueName, true);
@@ -92,7 +95,7 @@ public class TradeEngineConfig {
     public CachingConnectionFactory rabbitConnectionFactory(){
         CachingConnectionFactory connection = new CachingConnectionFactory();
         connection.setHost(host);
-        connection.setPort(15672);
+        connection.setPort(5672);
         connection.setUsername(userName);
         connection.setPassword(password);
         return connection;

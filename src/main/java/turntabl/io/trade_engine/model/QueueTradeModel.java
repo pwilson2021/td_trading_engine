@@ -1,19 +1,21 @@
 package turntabl.io.trade_engine.model;
 
-public class TradeModel {
+public class QueueTradeModel {
     private String product;
     private Integer quantity;
     private Double price;
     private String side;
+    private Integer exchangeId;
 
-    public TradeModel(String product, Integer quantity, Double price, String side) {
+    public QueueTradeModel(String product, Integer quantity, Double price, String side, Integer exchangeId) {
         this.product = product;
         this.quantity = quantity;
         this.price = price;
         this.side = side;
+        this.exchangeId = exchangeId;
     }
 
-    public TradeModel() {
+    public QueueTradeModel() {
     }
 
     public String getProduct() {
@@ -48,13 +50,22 @@ public class TradeModel {
         this.side = side;
     }
 
+    public Integer getExchangeId() {
+        return exchangeId;
+    }
+
+    public void setExchangeId(Integer exchangeId) {
+        this.exchangeId = exchangeId;
+    }
+
     @Override
     public String toString() {
-        return "TradeModel{" +
+        return "QueueTradeModel{" +
                 "product='" + product + '\'' +
                 ", quantity=" + quantity +
                 ", price=" + price +
                 ", side='" + side + '\'' +
+                ", exchangeId=" + exchangeId +
                 '}';
     }
 }
