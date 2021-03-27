@@ -38,7 +38,9 @@ public class TradeEngineConfig {
     }
 
     @Bean
-    public ChannelTopic topic() {return new ChannelTopic("pubsub:message-channel");}
+    public ChannelTopic tradeTopic() {return new ChannelTopic("ovs-trade-engine");}
+    @Bean
+    public ChannelTopic reportTopic() {return new ChannelTopic("reporting-service");}
 
     @Bean
     public MessageListenerAdapter messageListenerAdapter(){
@@ -48,14 +50,14 @@ public class TradeEngineConfig {
     }
 
     @Bean
-    TradePublisher redisPublisher(){
-        return new TradePublisher(template(),topic());
+    TradePublisher reportPublisher(){
+        return new TradePublisher(template(),reportTopic());
     }
     @Bean
     public RedisMessageListenerContainer redisContainer(){
         RedisMessageListenerContainer container = new RedisMessageListenerContainer();
         container.setConnectionFactory(connectionFactory());
-        container.addMessageListener(messageListenerAdapter(), topic());
+        container.addMessageListener(messageListenerAdapter(), tradeTopic());
 
         return container;
     }
