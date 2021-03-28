@@ -6,13 +6,15 @@ public class QueueTradeModel {
     private Double price;
     private String side;
     private Integer exchangeId;
+    private int orderId;
 
-    public QueueTradeModel(String product, Integer quantity, Double price, String side, Integer exchangeId) {
+    public QueueTradeModel(String product, Integer quantity, Double price, String side, Integer exchangeId, int orderId) {
         this.product = product;
         this.quantity = quantity;
         this.price = price;
         this.side = side;
         this.exchangeId = exchangeId;
+        this.orderId = orderId;
     }
 
     public QueueTradeModel() {
@@ -56,6 +58,14 @@ public class QueueTradeModel {
 
     public void setExchangeId(Integer exchangeId) {
         this.exchangeId = exchangeId;
+    }
+
+    public int getOrderId() {
+        return orderId;
+    }
+
+    public void setOrderId(int orderId) {
+        this.orderId = orderId;
     }
 
     @Override

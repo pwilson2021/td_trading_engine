@@ -11,19 +11,18 @@ import turntabl.io.trade_engine.publish.TradeEngineRabbitMqSender;
 @RestController
 public class TradeEngineController2 {
     private OrderService orderService;
-    @Autowired
     private TradeEngineRabbitMqSender tradeEngineRabbitMqSender;
 
-
     @Autowired
-    public TradeEngineController2(OrderService orderService) {
+    public TradeEngineController2(OrderService orderService, TradeEngineRabbitMqSender tradeEngineRabbitMqSender) {
         this.orderService = orderService;
+        this.tradeEngineRabbitMqSender = tradeEngineRabbitMqSender;
     }
 
     @GetMapping("ultimate/test/{orderId}")
     public void testTradeEngine(@PathVariable("orderId") int order_id) {
        Order order = orderService.findOrder(order_id);
-       TradeEngineLogic tradeEngineLogic = new TradeEngineLogic(order, tradeEngineRabbitMqSender);
+       TradeEngineLogic tradeEngineLogic = new TradeEngineLogic(order, orderService, tradeEngineRabbitMqSender);
        tradeEngineLogic.tradeEngineLogic();
     }
 }

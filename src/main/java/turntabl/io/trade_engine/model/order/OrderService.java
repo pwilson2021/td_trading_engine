@@ -7,6 +7,7 @@ import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class OrderService {
@@ -32,12 +33,12 @@ public class OrderService {
     }
 
     @Transactional
-    public void updateOrder(Integer orderId, Double price, int quantity, String order_status) {
+    public void updateOrder(Integer orderId, Double price, int quantity, String order_status, int fulfilled_quantity) {
         Order order =  orderRepository.findById(orderId)
                 .orElseThrow(() -> new IllegalStateException(
                         "Order with id "+ orderId + " does not exist"
                 ));
-
+        System.out.println(order.getId());
         if (price != null &&  !Objects.equals(order.getPrice() , price)) {
             order.setPrice(price);
         }
@@ -49,8 +50,9 @@ public class OrderService {
         if (order_status != null &&  !Objects.equals(order.getOrder_status() , order_status)) {
             order.setOrder_status(order_status);
         }
-
-
+        if (fulfilled_quantity != 0 &&  !Objects.equals(order.getQtyFulfilled() , fulfilled_quantity)) {
+            order.setQtyFulfilled(fulfilled_quantity);
+        }
     }
 
     public Order findOrder(int order_id) {
@@ -61,5 +63,10 @@ public class OrderService {
 
         Optional<Order> order = orderRepository.findById(order_id);
         return order.get();
+    }
+
+    public List<Order> findIncompleteOrders() {
+        List<Order> orderList = orderRepository.findAll();
+        return orderList.stream().filter(order -> !order.getOrder_status().equals("completed") && !order.getOrder_status().equals("cancelled")).collect(Collectors.toList());
     }
 }

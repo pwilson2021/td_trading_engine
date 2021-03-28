@@ -11,6 +11,7 @@ public class ExchangeOrder {
     private String side;
     private List<ExecutionModel> executions;
     private Integer cumulatitiveQuantity;
+    private Integer exchangeId;
 
     public ExchangeOrder(
             @JsonProperty("product") String product,
@@ -76,6 +77,14 @@ public class ExchangeOrder {
 
     public void setCumulatitiveQuantity(Integer cumulatitiveQuantity) {
         this.cumulatitiveQuantity = cumulatitiveQuantity;
+    }
+
+    public Integer getExchangeId() {
+        return exchangeId;
+    }
+
+    public void setExchangeId(Integer exchangeId) {
+        this.exchangeId = exchangeId;
     }
 
     @Override
