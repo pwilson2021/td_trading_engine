@@ -28,8 +28,8 @@ public class CheckOrderStatus {
         List<Order> orderList = orderService.findIncompleteOrders();
         System.out.println(orderList.size());
         orderList.forEach( order -> {
-            TradeEngineLogic tradeEngineLogic = new TradeEngineLogic(order, orderService, tradeEngineRabbitMqSender);
-            tradeEngineLogic.tradeEngineLogic();
+            TradeEngineLogic tradeEngineLogic = new TradeEngineLogic();
+            tradeEngineLogic.tradeEngineLogic(order);
         });
     }
 }

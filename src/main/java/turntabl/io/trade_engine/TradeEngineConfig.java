@@ -4,6 +4,7 @@ import org.springframework.amqp.core.*;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,10 +16,16 @@ import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
 import org.springframework.data.redis.serializer.GenericToStringSerializer;
 import turntabl.io.trade_engine.listener.OrderListener;
+import turntabl.io.trade_engine.model.order.OrderRepository;
+import turntabl.io.trade_engine.model.order.OrderService;
 import turntabl.io.trade_engine.publish.TradePublisher;
 
 @Configuration
 public class TradeEngineConfig {
+
+    @Autowired
+    private OrderRepository orderRepository;
+
     @Bean
     public JedisConnectionFactory connectionFactory(){
         RedisStandaloneConfiguration configuration = new RedisStandaloneConfiguration();
@@ -44,9 +51,12 @@ public class TradeEngineConfig {
 
     @Bean
     public MessageListenerAdapter messageListenerAdapter(){
-//        pass the receiver object to the MessageListener Adapter
-        return new MessageListenerAdapter(new OrderListener());
+//      pass the receiver object to the MessageListener Adapter
+        return new MessageListenerAdapter(new OrderListener(orderService(orderRepository)));
+    }
 
+    public OrderService orderService(OrderRepository orderRepository){
+        return new OrderService(orderRepository);
     }
 
     @Bean

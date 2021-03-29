@@ -8,7 +8,6 @@ import turntabl.io.trade_engine.model.QueueTradeModel;
 
 @Service
 public class TradeEngineRabbitMqSender {
-
     @Autowired
     private AmqpTemplate rabTemplate;
 

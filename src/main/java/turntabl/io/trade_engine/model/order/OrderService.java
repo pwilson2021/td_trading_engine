@@ -2,6 +2,7 @@ package turntabl.io.trade_engine.model.order;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import turntabl.io.trade_engine.TradeEngineLogic;
 
 import javax.transaction.Transactional;
 import java.util.List;
@@ -11,9 +12,9 @@ import java.util.stream.Collectors;
 
 @Service
 public class OrderService {
-    private final OrderRepository orderRepository;
-
     @Autowired
+    OrderRepository orderRepository;
+
     public OrderService(OrderRepository orderRepository) {
         this.orderRepository = orderRepository;
     }
@@ -68,5 +69,12 @@ public class OrderService {
     public List<Order> findIncompleteOrders() {
         List<Order> orderList = orderRepository.findAll();
         return orderList.stream().filter(order -> !order.getOrder_status().equals("completed") && !order.getOrder_status().equals("cancelled")).collect(Collectors.toList());
+    }
+
+        public void testTradeEngineController(int id) {
+        Order order = findOrder(id);
+        TradeEngineLogic tradeEngineLogic = new TradeEngineLogic();
+        tradeEngineLogic.tradeEngineLogic(order);
+        System.out.println("im working");
     }
 }
