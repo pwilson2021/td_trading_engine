@@ -22,7 +22,7 @@ public class TradeEngineConfig {
     @Bean
     public JedisConnectionFactory connectionFactory(){
         RedisStandaloneConfiguration configuration = new RedisStandaloneConfiguration();
-        configuration.setHostName("localhost");
+        configuration.setHostName("192.81.210.68");
         configuration.setPort(6379);
 
         return new JedisConnectionFactory(configuration);
@@ -97,7 +97,7 @@ public class TradeEngineConfig {
     public CachingConnectionFactory rabbitConnectionFactory(){
         CachingConnectionFactory connection = new CachingConnectionFactory();
         connection.setHost(host);
-        connection.setPort(5672);
+        connection.setPort(port);
         connection.setUsername(userName);
         connection.setPassword(password);
         return connection;
