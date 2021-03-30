@@ -24,14 +24,15 @@ public class CheckOrderStatus {
 
     private static final Logger log = LoggerFactory.getLogger(CheckOrderStatus.class);
 
-    @Scheduled(fixedRate = 10000)
+    @Scheduled(fixedRate = 15000)
     public void handleOrders () {
         System.out.println("Scheduled tasks have begun");
         List<Order> orderList = orderService.findIncompleteOrders();
         System.out.println(orderList.size());
         orderList.forEach( order -> {
-            TradeEngineLogic tradeEngineLogic = new TradeEngineLogic(order, orderService, tradeEngineRabbitMqSender);
-            tradeEngineLogic.tradeEngineLogic();
+            TradeEngineLogic tradeEngineLogic = new TradeEngineLogic();
+            tradeEngineLogic.setTradeEngineRabbitMqSender(tradeEngineRabbitMqSender);
+            tradeEngineLogic.tradeEngineLogic(order);
         });
     }
 

@@ -1,6 +1,7 @@
 package turntabl.io.trade_engine;
 
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
@@ -16,7 +17,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@RestController
 public class TradeEngineLogic {
     private Order order;
     public Flux<ExchangeOrder> exchange1Orders;
@@ -27,26 +27,31 @@ public class TradeEngineLogic {
     private String ord_type1 ="buy";
     private String ord_type2 ="sell";
 
-    private TradeEngineRabbitMqSender tradeEngineRabbitMqSender;
+    private TradeEngineRabbitMqSender tradeEngineRabbitMqSender = new TradeEngineRabbitMqSender();
 
     private OrderService orderService;
 
     WebClient client = WebClient.create();
 
-    public TradeEngineLogic(Order order, OrderService orderService, TradeEngineRabbitMqSender tradeEngineRabbitMqSender) {
-        this.order = order;
-        String ord_type = order.getOrder_type().equals(ord_type1) ? ord_type2 : ord_type1;
-        this.exchange1Orders = dynamicFetch(order.getProduct().getTicker(), 1, ord_type);
-        this.exchange2Orders = dynamicFetch(order.getProduct().getTicker(), 2, ord_type);
-        this.orderService = orderService;
-        this.tradeEngineRabbitMqSender = tradeEngineRabbitMqSender;
-    }
+//    public TradeEngineLogic(Order order, OrderService orderService, TradeEngineRabbitMqSender tradeEngineRabbitMqSender) {
+//        this.order = order;
+//
+//        this.orderService = orderService;
+//        this.tradeEngineRabbitMqSender = tradeEngineRabbitMqSender;
+//    }
 
     public TradeEngineLogic() {
     }
 
+    public void setTradeEngineRabbitMqSender(TradeEngineRabbitMqSender tradeEngineRabbitMqSender) {
+        this.tradeEngineRabbitMqSender = tradeEngineRabbitMqSender;
+    }
 
-    public void tradeEngineLogic () {
+    public void tradeEngineLogic (Order order) {
+        this.order = order;
+        String ord_type = order.getOrder_type().equals(ord_type1) ? ord_type2 : ord_type1;
+        this.exchange1Orders = dynamicFetch(order.getProduct().getTicker(), 1, ord_type);
+        this.exchange2Orders = dynamicFetch(order.getProduct().getTicker(), 2, ord_type);
         System.out.println("Starting");
         if(order.getOrder_type().equals("buy")) {
             List<ExchangeOrder> firstSet =  exchange1Orders.toStream().filter(ord -> ord.getPrice() <= order.getPrice())
