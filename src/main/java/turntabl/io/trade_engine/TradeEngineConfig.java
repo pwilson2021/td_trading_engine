@@ -4,6 +4,7 @@ import org.springframework.amqp.core.*;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,14 +16,20 @@ import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
 import org.springframework.data.redis.serializer.GenericToStringSerializer;
 import turntabl.io.trade_engine.listener.OrderListener;
+import turntabl.io.trade_engine.model.order.OrderRepository;
+import turntabl.io.trade_engine.model.order.OrderService;
 import turntabl.io.trade_engine.publish.TradePublisher;
 
 @Configuration
 public class TradeEngineConfig {
+
+    @Autowired
+    private OrderRepository orderRepository;
+
     @Bean
     public JedisConnectionFactory connectionFactory(){
         RedisStandaloneConfiguration configuration = new RedisStandaloneConfiguration();
-        configuration.setHostName("localhost");
+        configuration.setHostName("192.81.210.68");
         configuration.setPort(6379);
 
         return new JedisConnectionFactory(configuration);
@@ -38,34 +45,39 @@ public class TradeEngineConfig {
     }
 
     @Bean
-    public ChannelTopic topic() {return new ChannelTopic("pubsub:message-channel");}
+    public ChannelTopic tradeTopic() {return new ChannelTopic("ovs-trade-engine");}
+    @Bean
+    public ChannelTopic reportTopic() {return new ChannelTopic("reporting-service");}
 
     @Bean
     public MessageListenerAdapter messageListenerAdapter(){
-//        pass the receiver object to the MessageListener Adapter
-        return new MessageListenerAdapter(new OrderListener());
+//      pass the receiver object to the MessageListener Adapter
+        return new MessageListenerAdapter(new OrderListener(orderService(orderRepository)));
+    }
 
+    public OrderService orderService(OrderRepository orderRepository){
+        return new OrderService(orderRepository);
     }
 
     @Bean
-    TradePublisher redisPublisher(){
-        return new TradePublisher(template(),topic());
+    TradePublisher reportPublisher(){
+        return new TradePublisher(template(),reportTopic());
     }
     @Bean
     public RedisMessageListenerContainer redisContainer(){
         RedisMessageListenerContainer container = new RedisMessageListenerContainer();
         container.setConnectionFactory(connectionFactory());
-        container.addMessageListener(messageListenerAdapter(), topic());
+        container.addMessageListener(messageListenerAdapter(), tradeTopic());
 
         return container;
     }
 
 //    rabbit mq config
-    @Value("${menu.rabbitmq.queue}")
+    @Value("${trade.engine.rabbitmq.queue}")
     String queueName;
-    @Value("${menu.rabbitmq.exchange}")
+    @Value("${trade.engine.rabbitmq.exchange}")
     String exchange;
-    @Value("${menu.rabbitmq.key}")
+    @Value("${trade.engine.rabbitmq.key}")
     private String key;
 
     @Value("${spring.rabbitmq.host}")
@@ -75,6 +87,9 @@ public class TradeEngineConfig {
 
     @Value("${spring.rabbitmq.username}")
     private String userName;
+
+    @Value("${spring.rabbitmq.port}")
+    private int port;
 
     @Bean
     Queue queue(){
