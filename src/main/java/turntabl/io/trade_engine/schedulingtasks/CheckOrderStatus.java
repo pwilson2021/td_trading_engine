@@ -15,26 +15,21 @@ import java.util.List;
 
 @Component
 public class CheckOrderStatus {
-
     @Autowired
     private OrderService orderService;
-
     @Autowired
-    private TradeEngineRabbitMqSender tradeEngineRabbitMqSender;
-
+    private TradeEngineLogic tradeEngineLogic;
     private static final Logger log = LoggerFactory.getLogger(CheckOrderStatus.class);
 
-    //@Scheduled(fixedRate = 15000)
-//    public void handleOrders () {
-//        System.out.println("Scheduled tasks have begun");
-//        List<Order> orderList = orderService.findIncompleteOrders();
-//        System.out.println(orderList.size());
-//        orderList.forEach( order -> {
-//            TradeEngineLogic tradeEngineLogic = new TradeEngineLogic();
-//            tradeEngineLogic.setTradeEngineRabbitMqSender(tradeEngineRabbitMqSender);
-//            tradeEngineLogic.setOrderService(orderService);
-//            tradeEngineLogic.tradeEngineLogic(order);
-//        });
-//    }
+    @Scheduled(fixedRate = 15000)
+    public void handleOrders () {
+        System.out.println("Scheduled tasks have begun");
+        List<Order> orderList = orderService.findIncompleteOrders();
+        System.out.println(orderList.size());
+        orderList.forEach( order -> {
+            tradeEngineLogic.setOrder(order);
+            tradeEngineLogic.tradeEngineLogic();
+        });
+    }
 
 }
