@@ -76,6 +76,7 @@ public class QueueTradeModel {
                 ", price=" + price +
                 ", side='" + side + '\'' +
                 ", exchangeId=" + exchangeId +
+                ", orderId=" + orderId +
                 '}';
     }
 }

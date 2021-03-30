@@ -18,13 +18,14 @@ import org.springframework.data.redis.serializer.GenericToStringSerializer;
 import turntabl.io.trade_engine.listener.OrderListener;
 import turntabl.io.trade_engine.model.order.OrderRepository;
 import turntabl.io.trade_engine.model.order.OrderService;
+import turntabl.io.trade_engine.publish.TradeEngineRabbitMqSender;
 import turntabl.io.trade_engine.publish.TradePublisher;
 
 @Configuration
 public class TradeEngineConfig {
 
     @Autowired
-    private OrderRepository orderRepository;
+    private TradeEngineLogic tradeEngineLogic;
 
     @Bean
     public JedisConnectionFactory connectionFactory(){
@@ -52,12 +53,13 @@ public class TradeEngineConfig {
     @Bean
     public MessageListenerAdapter messageListenerAdapter(){
 //      pass the receiver object to the MessageListener Adapter
-        return new MessageListenerAdapter(new OrderListener(orderService(orderRepository)));
+        return new MessageListenerAdapter(new OrderListener(tradeEngineLogic));
+        // return new MessageListenerAdapter(new OrderListener(orderService(orderRepository)));
     }
 
-    public OrderService orderService(OrderRepository orderRepository){
-        return new OrderService(orderRepository);
-    }
+//    public OrderService orderService(OrderRepository orderRepository){
+//        return new OrderService(orderRepository);
+//    }
 
     @Bean
     TradePublisher reportPublisher(){
@@ -106,10 +108,10 @@ public class TradeEngineConfig {
     @Bean
     public CachingConnectionFactory rabbitConnectionFactory(){
         CachingConnectionFactory connection = new CachingConnectionFactory();
-        connection.setHost(host);
-        connection.setPort(port);
-        connection.setUsername(userName);
-        connection.setPassword(password);
+        connection.setHost("192.81.210.68");
+        connection.setPort(5672);
+        connection.setUsername("guest");
+        connection.setPassword("guest");
         return connection;
     }
     @Bean
@@ -124,4 +126,8 @@ public class TradeEngineConfig {
         return rabbitTemplate;
     }
 
+//    @Bean
+//    public TradeEngineRabbitMqSender sender() {
+//        return new TradeEngineRabbitMqSender();
+//    }
 }
