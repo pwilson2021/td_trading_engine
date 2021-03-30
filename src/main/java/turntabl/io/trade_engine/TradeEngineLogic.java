@@ -1,6 +1,7 @@
 package turntabl.io.trade_engine;
 
 
+import org.aspectj.weaver.ast.Or;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Controller;
@@ -52,6 +53,10 @@ public class TradeEngineLogic {
     public void setOrder(int orderId) {
         System.out.println(tradeEngineRabbitMqSender);
         this.order = orderService.findOrder(orderId);
+    }
+
+    public void setOrder(Order order) {
+        this.order = order;
     }
 
     public void tradeEngineLogic () {
