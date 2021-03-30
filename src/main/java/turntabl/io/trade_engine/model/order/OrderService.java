@@ -73,7 +73,7 @@ public class OrderService {
     public List<Order> findIncompleteOrders() {
         List<Order> orderList = orderRepository.findAll();
         return orderList.stream().filter(
-                order -> !order.getOrder_status().equals("completed") && !order.getOrder_status().equals("cancelled") && !order.getOrder_status().equals("pending")
+                order -> order.getOrder_status().equals("partially_fulfilled") || order.getOrder_status().equals("hold")
         ).collect(Collectors.toList());
     }
 

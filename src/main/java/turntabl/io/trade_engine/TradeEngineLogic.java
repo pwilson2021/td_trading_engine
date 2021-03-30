@@ -124,6 +124,7 @@ public class TradeEngineLogic {
         int i = 0;
         if (orderSet.size() == 0 || orderQuantity == 0) {
             System.out.println("OrderSet is Empty or Order has been fullfilled already");
+            orderService.updateOrder(order.getId(), null, 0, "hold",0);
             return;
         }
 
