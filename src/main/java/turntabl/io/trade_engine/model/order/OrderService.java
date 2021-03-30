@@ -80,8 +80,11 @@ public class OrderService {
         public void testTradeEngineController(int id) {
         Order order = findOrder(id);
         TradeEngineLogic tradeEngineLogic = new TradeEngineLogic();
-        tradeEngineLogic.tradeEngineLogic(order);
         tradeEngineLogic.setTradeEngineRabbitMqSender(tradeEngineRabbitMqSender);
+        tradeEngineLogic.setOrderService(new OrderService(orderRepository));
+
+        tradeEngineLogic.tradeEngineLogic(order);
+
         System.out.println("im working");
     }
 }

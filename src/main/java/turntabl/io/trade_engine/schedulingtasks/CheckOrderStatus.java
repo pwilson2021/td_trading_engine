@@ -32,6 +32,7 @@ public class CheckOrderStatus {
         orderList.forEach( order -> {
             TradeEngineLogic tradeEngineLogic = new TradeEngineLogic();
             tradeEngineLogic.setTradeEngineRabbitMqSender(tradeEngineRabbitMqSender);
+            tradeEngineLogic.setOrderService(orderService);
             tradeEngineLogic.tradeEngineLogic(order);
         });
     }

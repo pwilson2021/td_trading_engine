@@ -43,6 +43,10 @@ public class TradeEngineLogic {
     public TradeEngineLogic() {
     }
 
+    public void setOrderService(OrderService orderService) {
+        this.orderService = orderService;
+    }
+
     public void setTradeEngineRabbitMqSender(TradeEngineRabbitMqSender tradeEngineRabbitMqSender) {
         this.tradeEngineRabbitMqSender = tradeEngineRabbitMqSender;
     }
