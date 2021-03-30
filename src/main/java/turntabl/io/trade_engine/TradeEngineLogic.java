@@ -2,7 +2,8 @@ package turntabl.io.trade_engine;
 
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -17,6 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Controller
 public class TradeEngineLogic {
     private Order order;
     public Flux<ExchangeOrder> exchange1Orders;
@@ -27,32 +29,33 @@ public class TradeEngineLogic {
     private String ord_type1 ="buy";
     private String ord_type2 ="sell";
 
-    private TradeEngineRabbitMqSender tradeEngineRabbitMqSender = new TradeEngineRabbitMqSender();
-
+    @Autowired
+    private TradeEngineRabbitMqSender tradeEngineRabbitMqSender;
+    @Autowired
     private OrderService orderService;
 
     WebClient client = WebClient.create();
 
-//    public TradeEngineLogic(Order order, OrderService orderService, TradeEngineRabbitMqSender tradeEngineRabbitMqSender) {
-//        this.order = order;
-//
+    public TradeEngineLogic() {
+
+    }
+
+//    public void setOrderService(OrderService orderService) {
 //        this.orderService = orderService;
+//    }
+//
+//    public void setTradeEngineRabbitMqSender(TradeEngineRabbitMqSender tradeEngineRabbitMqSender) {
 //        this.tradeEngineRabbitMqSender = tradeEngineRabbitMqSender;
 //    }
 
-    public TradeEngineLogic() {
+
+    public void setOrder(int orderId) {
+        System.out.println(tradeEngineRabbitMqSender);
+        this.order = orderService.findOrder(orderId);
     }
 
-    public void setOrderService(OrderService orderService) {
-        this.orderService = orderService;
-    }
-
-    public void setTradeEngineRabbitMqSender(TradeEngineRabbitMqSender tradeEngineRabbitMqSender) {
-        this.tradeEngineRabbitMqSender = tradeEngineRabbitMqSender;
-    }
-
-    public void tradeEngineLogic (Order order) {
-        this.order = order;
+    public void tradeEngineLogic () {
+//        this.order = order;
         String ord_type = order.getOrder_type().equals(ord_type1) ? ord_type2 : ord_type1;
         this.exchange1Orders = dynamicFetch(order.getProduct().getTicker(), 1, ord_type);
         this.exchange2Orders = dynamicFetch(order.getProduct().getTicker(), 2, ord_type);

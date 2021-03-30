@@ -13,12 +13,12 @@ import java.util.stream.Collectors;
 
 @Service
 public class OrderService {
-    @Autowired
-    OrderRepository orderRepository;
+    private final OrderRepository orderRepository;
+
+//    @Autowired
+//    TradeEngineRabbitMqSender tradeEngineRabbitMqSender;
 
     @Autowired
-    TradeEngineRabbitMqSender tradeEngineRabbitMqSender;
-
     public OrderService(OrderRepository orderRepository) {
         this.orderRepository = orderRepository;
     }
@@ -77,14 +77,15 @@ public class OrderService {
         ).collect(Collectors.toList());
     }
 
-        public void testTradeEngineController(int id) {
-        Order order = findOrder(id);
-        TradeEngineLogic tradeEngineLogic = new TradeEngineLogic();
-        tradeEngineLogic.setTradeEngineRabbitMqSender(tradeEngineRabbitMqSender);
-        tradeEngineLogic.setOrderService(new OrderService(orderRepository));
+//        public void testTradeEngineController(int id) {
+//        Order order = findOrder(id);
+//        TradeEngineLogic tradeEngineLogic = new TradeEngineLogic();
+        //System.out.println(tradeEngineRabbitMqSender);
+//        tradeEngineLogic.setTradeEngineRabbitMqSender(tradeEngineRabbitMqSender);
+//        tradeEngineLogic.setOrderService(new OrderService(orderRepository));
+//
+//        tradeEngineLogic.tradeEngineLogic(order);
 
-        tradeEngineLogic.tradeEngineLogic(order);
-
-        System.out.println("im working");
-    }
+      //  System.out.println("im working");
+   // }
 }
