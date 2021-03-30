@@ -107,7 +107,7 @@ public class TradeEngineConfig {
     public CachingConnectionFactory rabbitConnectionFactory(){
         CachingConnectionFactory connection = new CachingConnectionFactory();
         connection.setHost(host);
-        connection.setPort(5672);
+        connection.setPort(port);
         connection.setUsername(userName);
         connection.setPassword(password);
         return connection;

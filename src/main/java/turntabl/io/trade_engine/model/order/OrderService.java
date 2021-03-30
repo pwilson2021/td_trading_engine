@@ -72,14 +72,19 @@ public class OrderService {
 
     public List<Order> findIncompleteOrders() {
         List<Order> orderList = orderRepository.findAll();
-        return orderList.stream().filter(order -> !order.getOrder_status().equals("completed") && !order.getOrder_status().equals("cancelled")).collect(Collectors.toList());
+        return orderList.stream().filter(
+                order -> !order.getOrder_status().equals("completed") && !order.getOrder_status().equals("cancelled") && !order.getOrder_status().equals("pending")
+        ).collect(Collectors.toList());
     }
 
         public void testTradeEngineController(int id) {
         Order order = findOrder(id);
         TradeEngineLogic tradeEngineLogic = new TradeEngineLogic();
-        tradeEngineLogic.tradeEngineLogic(order);
         tradeEngineLogic.setTradeEngineRabbitMqSender(tradeEngineRabbitMqSender);
+        tradeEngineLogic.setOrderService(new OrderService(orderRepository));
+
+        tradeEngineLogic.tradeEngineLogic(order);
+
         System.out.println("im working");
     }
 }

@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.springframework.web.reactive.function.client.WebClient;
 import turntabl.io.trade_engine.TradeEngineLogic;
 import turntabl.io.trade_engine.model.order.Order;
 import turntabl.io.trade_engine.model.order.OrderService;
@@ -14,6 +15,7 @@ import java.util.List;
 
 @Component
 public class CheckOrderStatus {
+
     @Autowired
     private OrderService orderService;
 
@@ -30,7 +32,9 @@ public class CheckOrderStatus {
         orderList.forEach( order -> {
             TradeEngineLogic tradeEngineLogic = new TradeEngineLogic();
             tradeEngineLogic.setTradeEngineRabbitMqSender(tradeEngineRabbitMqSender);
+            tradeEngineLogic.setOrderService(orderService);
             tradeEngineLogic.tradeEngineLogic(order);
         });
     }
+
 }
