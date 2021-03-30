@@ -43,7 +43,9 @@ public class TradeEngineLogic {
     public TradeEngineLogic() {
     }
 
-
+    public void setTradeEngineRabbitMqSender(TradeEngineRabbitMqSender tradeEngineRabbitMqSender) {
+        this.tradeEngineRabbitMqSender = tradeEngineRabbitMqSender;
+    }
 
     public void tradeEngineLogic (Order order) {
         this.order = order;

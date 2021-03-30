@@ -3,6 +3,7 @@ package turntabl.io.trade_engine.model.order;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import turntabl.io.trade_engine.TradeEngineLogic;
+import turntabl.io.trade_engine.publish.TradeEngineRabbitMqSender;
 
 import javax.transaction.Transactional;
 import java.util.List;
@@ -14,6 +15,9 @@ import java.util.stream.Collectors;
 public class OrderService {
     @Autowired
     OrderRepository orderRepository;
+
+    @Autowired
+    TradeEngineRabbitMqSender tradeEngineRabbitMqSender;
 
     public OrderService(OrderRepository orderRepository) {
         this.orderRepository = orderRepository;
@@ -75,6 +79,7 @@ public class OrderService {
         Order order = findOrder(id);
         TradeEngineLogic tradeEngineLogic = new TradeEngineLogic();
         tradeEngineLogic.tradeEngineLogic(order);
+        tradeEngineLogic.setTradeEngineRabbitMqSender(tradeEngineRabbitMqSender);
         System.out.println("im working");
     }
 }

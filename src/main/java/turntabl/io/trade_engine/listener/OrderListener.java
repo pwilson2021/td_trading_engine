@@ -6,6 +6,7 @@ import org.springframework.data.redis.connection.Message;
 import org.springframework.data.redis.connection.MessageListener;
 import turntabl.io.trade_engine.model.order.Order;
 import turntabl.io.trade_engine.model.order.OrderService;
+import turntabl.io.trade_engine.publish.TradeEngineRabbitMqSender;
 
 
 import java.io.IOException;
@@ -14,6 +15,7 @@ public class OrderListener implements MessageListener {
 
     @Autowired
     OrderService orderService;
+
 
     public OrderListener(OrderService orderService) {
         this.orderService = orderService;
