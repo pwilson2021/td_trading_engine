@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.CoreSubscriber;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import turntabl.io.trade_engine.model.ExchangeMarketDataModel;
@@ -22,8 +23,8 @@ import java.util.stream.Collectors;
 @Controller
 public class TradeEngineLogic {
     private Order order;
-    public Flux<ExchangeOrder> exchange1Orders;
-    public Flux<ExchangeOrder> exchange2Orders;
+    public List<ExchangeOrder> exchange1Orders;
+    public List<ExchangeOrder> exchange2Orders;
     private final String api_key = "240ccb53-33cf-4453-b4b0-e9ada4a7409d";
     private String exchange1 = "https://exchange.matraining.com/";
     private String exchange2 = "https://exchange2.matraining.com/";
@@ -61,21 +62,22 @@ public class TradeEngineLogic {
 
     public void tradeEngineLogic () {
 //        this.order = order;
+
         String ord_type = order.getOrder_type().equals(ord_type1) ? ord_type2 : ord_type1;
         this.exchange1Orders = dynamicFetch(order.getProduct().getTicker(), 1, ord_type);
         this.exchange2Orders = dynamicFetch(order.getProduct().getTicker(), 2, ord_type);
         System.out.println("Starting");
         if(order.getOrder_type().equals("buy")) {
-            List<ExchangeOrder> firstSet =  exchange1Orders.toStream().filter(ord -> ord.getPrice() <= order.getPrice())
+            List<ExchangeOrder> firstSet =  exchange1Orders.stream().filter(ord -> ord.getPrice() <= order.getPrice())
                       .sorted((ord1, ord2) -> order.getPrice().compareTo(ord2.getPrice())).collect(Collectors.toList()); //sell prices less than order price;
 
-            List<ExchangeOrder> secondSet = exchange1Orders.toStream().filter(ord -> (ord.getPrice() > order.getPrice()) && ((((ord.getPrice() - order.getPrice())/ ord.getPrice()) * 100) < 20))
+            List<ExchangeOrder> secondSet = exchange1Orders.stream().filter(ord -> (ord.getPrice() > order.getPrice()) && ((((ord.getPrice() - order.getPrice())/ ord.getPrice()) * 100) < 20))
                       .sorted((ord1, ord2) -> order.getPrice().compareTo(ord2.getPrice())).collect(Collectors.toList()); //sell prices a percentage more than the user's buy price
 
-            List<ExchangeOrder> thirdSet =  exchange2Orders.toStream().filter(ord -> ord.getPrice() <= order.getPrice())
+            List<ExchangeOrder> thirdSet =  exchange2Orders.stream().filter(ord -> ord.getPrice() <= order.getPrice())
                     .sorted((ord1, ord2) -> order.getPrice().compareTo(ord2.getPrice())).collect(Collectors.toList()); //sell prices less than order price;
 
-            List<ExchangeOrder> fourthSet = exchange2Orders.toStream().filter(ord -> (ord.getPrice() > order.getPrice()) && ((((ord.getPrice() - order.getPrice())/ ord.getPrice()) * 100) < 20))
+            List<ExchangeOrder> fourthSet = exchange2Orders.stream().filter(ord -> (ord.getPrice() > order.getPrice()) && ((((ord.getPrice() - order.getPrice())/ ord.getPrice()) * 100) < 20))
                     .sorted((ord1, ord2) -> order.getPrice().compareTo(ord2.getPrice())).collect(Collectors.toList()); //sell prices a percentage more than the user's buy price
 
             firstSet.forEach( ord -> ord.setExchangeId(1));
@@ -104,15 +106,15 @@ public class TradeEngineLogic {
                   splitOrder(order, mergedSet);
             }
         } else {
-            ExchangeMarketDataModel fetchExchange1MD = fetchMarketData(1, order.getProduct().getTicker()).block();
-            ExchangeMarketDataModel fetchExchange2MD =  fetchMarketData(2, order.getProduct().getTicker()).block();
+            ExchangeMarketDataModel fetchExchange1MD = fetchMarketData(1, order.getProduct().getTicker());
+           // ExchangeMarketDataModel fetchExchange2MD =  fetchMarketData(2, order.getProduct().getTicker());
 
             double firstExchangeCheck = order.getPrice() - fetchExchange1MD.getBid_price() ;
-            double secondExchangeCheck = order.getPrice() - fetchExchange2MD.getBid_price();
+            //double secondExchangeCheck = order.getPrice() - fetchExchange2MD.getBid_price();
 
-            int exchangeId = (Math.abs(firstExchangeCheck) < Math.abs(secondExchangeCheck)) ? 1 : 2;
+            //int exchangeId = (Math.abs(firstExchangeCheck) < Math.abs(secondExchangeCheck)) ? 1 : 2;
             QueueTradeModel queueTradeModel = new QueueTradeModel(order.getProduct().getTicker(),
-                    order.getQuantity(), order.getPrice(), order.getOrder_type(), exchangeId, order.getId() );
+                    order.getQuantity(), order.getPrice(), order.getOrder_type(), 1, order.getId() );
             System.out.println(queueTradeModel.toString());
             tradeEngineRabbitMqSender.send(queueTradeModel);
         }
@@ -123,7 +125,7 @@ public class TradeEngineLogic {
         int orderQuantity = order.getQuantity() - quantityFulfilled;
         int i = 0;
         if (orderSet.size() == 0 || orderQuantity == 0) {
-            System.out.println("OrderSet is Empty or Order has been fullfilled already");
+            System.out.println("OrderSet is Empty or Order has been fulfilled already");
             orderService.updateOrder(order.getId(), null, 0, "hold",0);
             return;
         }
@@ -156,20 +158,31 @@ public class TradeEngineLogic {
 
     }
 
-    private Flux<ExchangeOrder> dynamicFetch(
+    private List<ExchangeOrder> dynamicFetch(
             String ticker,
             int exchangeId,
             String side
     ) {
-        if (exchangeId == 1) {
-            return client.get().uri(exchange1+"orderbook/"+ticker+"/"+side).retrieve().bodyToFlux(ExchangeOrder.class);
-        } else {
-            return client.get().uri(exchange2+"orderbook/"+ticker+"/"+side).retrieve().bodyToFlux(ExchangeOrder.class);
+        try {
+            String exchange =  (exchangeId == 1 ) ? exchange1 : exchange2;
+            return client
+                    .get().uri(exchange+"orderbook/"+ticker+"/"+side).retrieve().bodyToFlux(ExchangeOrder.class).toStream().collect(Collectors.toList());
+        } catch (Exception e) {
+            System.out.println("Web Client Request Failed");
+            List<ExchangeOrder> exchangeOrders = new ArrayList<>();
+            return exchangeOrders;
         }
+
     }
 
-    private Mono<ExchangeMarketDataModel> fetchMarketData(int exchangeId, String ticker) {
+    private ExchangeMarketDataModel fetchMarketData(int exchangeId, String ticker) {
         String exchange =  (exchangeId == 1 ) ? exchange1 : exchange2;
-        return client.get().uri(exchange+"/md/"+ticker).retrieve().bodyToMono(ExchangeMarketDataModel.class);
+
+        try {
+            return client.get().uri(exchange+"/md/"+ticker).retrieve().bodyToMono(ExchangeMarketDataModel.class).block();
+        } catch (Exception e) {
+            ExchangeMarketDataModel exchangeMarketDataModel =  new ExchangeMarketDataModel();
+            return exchangeMarketDataModel;
+        }
     }
 }
