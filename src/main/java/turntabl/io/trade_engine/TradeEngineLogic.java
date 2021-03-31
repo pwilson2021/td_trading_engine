@@ -107,16 +107,18 @@ public class TradeEngineLogic {
             }
         } else {
             ExchangeMarketDataModel fetchExchange1MD = fetchMarketData(1, order.getProduct().getTicker());
-           // ExchangeMarketDataModel fetchExchange2MD =  fetchMarketData(2, order.getProduct().getTicker());
+            ExchangeMarketDataModel fetchExchange2MD =  fetchMarketData(2, order.getProduct().getTicker());
 
             double firstExchangeCheck = order.getPrice() - fetchExchange1MD.getBid_price() ;
-            //double secondExchangeCheck = order.getPrice() - fetchExchange2MD.getBid_price();
+            double secondExchangeCheck = order.getPrice() - fetchExchange2MD.getBid_price();
 
-            //int exchangeId = (Math.abs(firstExchangeCheck) < Math.abs(secondExchangeCheck)) ? 1 : 2;
+            int exchangeId = (Math.abs(firstExchangeCheck) < Math.abs(secondExchangeCheck)) ? 1 : 2;
             QueueTradeModel queueTradeModel = new QueueTradeModel(order.getProduct().getTicker(),
                     order.getQuantity(), order.getPrice(), order.getOrder_type(), 1, order.getId() );
             System.out.println(queueTradeModel.toString());
             tradeEngineRabbitMqSender.send(queueTradeModel);
+            orderService.updateOrder(order.getId(), null, 0, "completed",0);
+
         }
     }
 

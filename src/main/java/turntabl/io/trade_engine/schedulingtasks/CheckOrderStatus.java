@@ -21,7 +21,7 @@ public class CheckOrderStatus {
     private TradeEngineLogic tradeEngineLogic;
     private static final Logger log = LoggerFactory.getLogger(CheckOrderStatus.class);
 
-    @Scheduled(fixedRate = 15000)
+    @Scheduled(fixedRate = 30000)
     public void handleOrders () {
         System.out.println("Scheduled tasks have begun");
         List<Order> orderList = orderService.findIncompleteOrders();
